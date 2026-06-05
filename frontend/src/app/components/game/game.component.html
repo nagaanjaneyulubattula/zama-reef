@@ -1,0 +1,192 @@
+<div class="game-shell">
+  <header class="hud">
+    <button class="icon-btn" type="button" (click)="goHome()" title="Home">
+      <span class="material-symbols-rounded">home</span>
+    </button>
+
+    <div class="hud-stats">
+      <div class="hud-pill difficulty" [style.--diff-color]="difficultyOption.color">
+        <span class="material-symbols-rounded">{{ difficultyOption.icon }}</span>
+        <span class="value">{{ difficultyLabel() }}</span>
+      </div>
+      @if (snapshot().dailyChallenge) {
+        <div class="hud-pill daily">
+          <span class="material-symbols-rounded">today</span>
+          <span class="value">Daily</span>
+        </div>
+      }
+      <div class="hud-pill score">
+        <span class="material-symbols-rounded">scoreboard</span>
+        <span class="value">{{ snapshot().score }}</span>
+      </div>
+      @if (snapshot().comboMultiplier > 1) {
+        <div class="hud-pill combo">
+          <span class="material-symbols-rounded">local_fire_department</span>
+          <span class="value">x{{ snapshot().comboMultiplier | number: '1.1-1' }}</span>
+        </div>
+      }
+      <div class="hud-pill time">
+        <span class="material-symbols-rounded">timer</span>
+        <span class="value">{{ snapshot().timeSeconds }}s</span>
+      </div>
+      @if (snapshot().shieldSecondsLeft > 0) {
+        <div class="hud-pill shield">
+          <span class="material-symbols-rounded">shield</span>
+          <span class="value">{{ snapshot().shieldSecondsLeft | number: '1.0-1' }}s</span>
+        </div>
+      }
+      @if (snapshot().speedBoostSecondsLeft > 0) {
+        <div class="hud-pill boost">
+          <span class="material-symbols-rounded">bolt</span>
+          <span class="value">{{ snapshot().speedBoostSecondsLeft | number: '1.0-1' }}s</span>
+        </div>
+      }
+      @if (snapshot().invisibleSecondsLeft > 0) {
+        <div class="hud-pill stealth active">
+          <span class="material-symbols-rounded">visibility_off</span>
+          <span class="value">{{ snapshot().invisibleSecondsLeft | number: '1.0-1' }}s</span>
+        </div>
+      }
+    </div>
+
+    @if (snapshot().status === 'playing' || snapshot().status === 'boss' || snapshot().status === 'countdown') {
+      <button class="icon-btn" type="button" (click)="pauseGame()" title="Pause">
+        <span class="material-symbols-rounded">pause</span>
+      </button>
+    } @else if (snapshot().status === 'paused') {
+      <button class="icon-btn" type="button" (click)="resumeGame()" title="Resume">
+        <span class="material-symbols-rounded">play_arrow</span>
+      </button>
+    } @else {
+      <div class="icon-spacer"></div>
+    }
+  </header>
+
+  <div
+    class="canvas-wrap"
+    [class.shake]="snapshot().screenShake > 0.2"
+    [style.--shake]="snapshot().screenShake"
+  >
+    <canvas #gameCanvas class="game-canvas"></canvas>
+
+    <div class="radar" aria-label="Threat radar">
+      <span class="radar-label">RADAR</span>
+      @for (blip of snapshot().radarBlips; track $index) {
+        <span
+          class="blip"
+          [class]="'blip ' + blip.kind"
+          [style.left.%]="blip.x * 100"
+          [style.top.%]="blip.y * 100"
+        ></span>
+      }
+      <span class="radar-player"></span>
+    </div>
+
+    @if (snapshot().status === 'countdown') {
+      <div class="overlay countdown">
+        <div class="countdown-num">{{ snapshot().countdownSeconds || 1 }}</div>
+        <p>Swim UP to the Zama Reef</p>
+      </div>
+    }
+
+    @if (snapshot().showTutorial && snapshot().tutorialHint) {
+      <div class="tutorial-banner">
+        <span>{{ snapshot().tutorialHint }}</span>
+        <button type="button" class="tutorial-dismiss" (click)="dismissTutorial()">✕</button>
+      </div>
+    }
+
+    @if (snapshot().bossActive) {
+      <div class="boss-bar">
+        <span class="material-symbols-rounded">crisis_alert</span>
+        Block Explorer — {{ snapshot().bossTimeLeft | number: '1.0-0' }}s
+        <div class="boss-track">
+          <div
+            class="boss-fill"
+            [style.width.%]="(snapshot().bossHealth / snapshot().bossMaxHealth) * 100"
+          ></div>
+        </div>
+      </div>
+    }
+
+    @if (snapshot().status === 'paused') {
+      <div class="overlay">
+        <div class="overlay-card">
+          <span class="overlay-icon material-symbols-rounded">pause_circle</span>
+          <h2>Paused</h2>
+          <p>Take a breath — the reef awaits.</p>
+          <button class="btn btn-primary" type="button" (click)="resumeGame()">
+            <span class="material-symbols-rounded">play_arrow</span>
+            Resume
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (snapshot().status === 'won') {
+      <div class="overlay win">
+        <div class="overlay-card">
+          <span class="overlay-emoji">🪸</span>
+          <h2>Encrypted Safe!</h2>
+          <p>You reached the Zama Reef. Your data swims in privacy.</p>
+          <div class="result-stats">
+            <span>Score: <strong>{{ snapshot().score }}</strong></span>
+            <span>Time: <strong>{{ snapshot().timeSeconds }}s</strong></span>
+            <span>Near-miss: <strong>+{{ snapshot().nearMissBonus }}</strong></span>
+            <span>Checkpoints: <strong>{{ snapshot().checkpointsPassed }}/3</strong></span>
+            <span>Mode: <strong>{{ difficultyLabel() }}</strong></span>
+          </div>
+          <div class="overlay-actions">
+            <button class="btn btn-primary" type="button" (click)="restart()">
+              <span class="material-symbols-rounded">replay</span>
+              Play Again
+            </button>
+            <a class="btn btn-ghost" routerLink="/leaderboard">
+              <span class="material-symbols-rounded">leaderboard</span>
+              Leaderboard
+            </a>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (snapshot().status === 'lost') {
+      <div class="overlay lost">
+        <div class="overlay-card">
+          <span class="overlay-emoji">{{ snapshot().loseIcon }}</span>
+          <h2>Caught!</h2>
+          <p>{{ snapshot().message || 'A public-chain predator got you.' }}</p>
+          <div class="result-stats">
+            <span>Score: <strong>{{ snapshot().score }}</strong></span>
+            <span>Time: <strong>{{ snapshot().timeSeconds }}s</strong></span>
+            <span>Combo: <strong>x{{ snapshot().comboMultiplier | number: '1.1-1' }}</strong></span>
+          </div>
+          <div class="overlay-actions">
+            <button class="btn btn-primary" type="button" (click)="restart()">
+              <span class="material-symbols-rounded">replay</span>
+              Retry
+            </button>
+            <button class="btn btn-ghost" type="button" (click)="goHome()">
+              <span class="material-symbols-rounded">home</span>
+              Home
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="distance-bar">
+    <div class="distance-label">
+      <span><span class="material-symbols-rounded sm">spa</span> {{ snapshot().narrativeZone }}</span>
+      <span>{{ snapshot().distanceToReef | number: '1.0-0' }}m</span>
+    </div>
+    <div class="distance-track">
+      <div class="distance-fill" [style.width.%]="snapshot().journeyProgress"></div>
+    </div>
+  </div>
+
+  @if (snapshot().message && (snapshot().status === 'playing' || snapshot().status === 'boss')) {
+    <div class="toast">{{ snapshot().message }}</div>
+  }
+</div>

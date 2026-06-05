@@ -1,0 +1,33 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-icon">🔐</div>
+    <h1>Welcome back, diver</h1>
+    <p>Sign in to swim toward the encrypted Zama Reef.</p>
+
+    <form (ngSubmit)="onSubmit()">
+      <label>
+        <span>📧 Email</span>
+        <input type="email" [(ngModel)]="email" name="email" required autocomplete="email" placeholder="you@example.com" />
+      </label>
+
+      <label>
+        <span>🔑 Password</span>
+        <input type="password" [(ngModel)]="password" name="password" required autocomplete="current-password" placeholder="Your password" />
+      </label>
+
+      @if (error()) {
+        <div class="error">{{ error() }}</div>
+      }
+
+      <button class="btn btn-primary" type="submit" [disabled]="loading()">
+        {{ loading() ? 'Signing in...' : '🌊 Sign In' }}
+      </button>
+    </form>
+
+    <p class="switch">
+      New octopus?
+      <a routerLink="/register">Create an account</a>
+    </p>
+    <a class="back" routerLink="/">← Back to home</a>
+  </div>
+</div>

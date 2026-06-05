@@ -1,0 +1,181 @@
+<div class="home">
+  <div class="hero-glow"></div>
+  <div class="hero-bubbles" aria-hidden="true">
+    @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+      <span class="bubble" [style.--i]="i"></span>
+    }
+  </div>
+
+  <header class="hero">
+    <div class="badge">
+      <span class="material-symbols-rounded">encrypted</span>
+      Encrypted-by-default
+    </div>
+    <h1>
+      <span class="emoji-title">🐙</span>
+      Zama Reef Escape
+    </h1>
+    <p class="tagline">
+      Swim past public-chain predators and reach the safe waters of Zama's encrypted reef.
+    </p>
+  </header>
+
+  <section class="panel start-panel">
+    @if (auth.isLoggedIn()) {
+      <div class="user-bar">
+        <span class="user-greeting">
+          <span class="material-symbols-rounded">badge</span>
+          {{ auth.displayName() }}
+        </span>
+        <button class="btn btn-ghost btn-sm" type="button" (click)="signOut()">
+          <span class="material-symbols-rounded">logout</span>
+          Sign out
+        </button>
+      </div>
+
+      <label class="daily-toggle">
+        <input type="checkbox" [checked]="settings.dailyChallenge()" (change)="toggleDaily()" />
+        <span class="material-symbols-rounded">today</span>
+        <span>
+          <strong>Daily Challenge</strong>
+          <small>Same predator layout for everyone today</small>
+        </span>
+      </label>
+
+      <div class="difficulty-picker">
+        <span class="field-label">
+          <span class="material-symbols-rounded">tune</span>
+          Difficulty
+        </span>
+        <div class="difficulty-options">
+          @for (d of difficulties; track d.id) {
+            <button
+              type="button"
+              class="difficulty-btn"
+              [class.selected]="settings.difficulty() === d.id"
+              [style.--accent]="d.color"
+              (click)="selectDifficulty(d.id)"
+            >
+              <span class="material-symbols-rounded">{{ d.icon }}</span>
+              <span class="diff-name">{{ d.label }}</span>
+              <small>{{ d.description }}</small>
+            </button>
+          }
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-launch" type="button" (click)="startGame()">
+        <span class="material-symbols-rounded">sailing</span>
+        Start Escape
+      </button>
+    } @else {
+      <p class="auth-prompt">Register or sign in to play and save your scores.</p>
+      <a class="btn btn-primary" routerLink="/register">
+        <span class="material-symbols-rounded">person_add</span>
+        Register
+      </a>
+      <a class="btn btn-ghost" routerLink="/login">
+        <span class="material-symbols-rounded">login</span>
+        Sign In
+      </a>
+    }
+    <a class="btn btn-ghost" routerLink="/leaderboard">
+      <span class="material-symbols-rounded">leaderboard</span>
+      Leaderboard
+    </a>
+  </section>
+
+  <section class="panel mechanics-panel">
+    <h2><span class="material-symbols-rounded">bolt</span> Power-ups</h2>
+    <div class="cards">
+      <article class="card">
+        <div class="card-icon pearl">
+          <span class="material-symbols-rounded">diamond</span>
+        </div>
+        <h3>FHE Pearl</h3>
+        <p>5 seconds of invisibility from public-chain hunters.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon reef">
+          <span class="material-symbols-rounded">beach_access</span>
+        </div>
+        <h3>Privacy Reef</h3>
+        <p>Instant teleport to a safer stretch of ocean.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="panel threats-panel">
+    <h2><span class="material-symbols-rounded">warning</span> Avoid</h2>
+    <div class="threats">
+      <div class="threat shark">
+        <span class="threat-emoji">🦈</span>
+        <div>
+          <strong>Public Sharks</strong>
+          <small>Fast homing pursuers from exposed chains</small>
+        </div>
+        <span class="material-symbols-rounded threat-badge">speed</span>
+      </div>
+      <div class="threat whale">
+        <span class="threat-emoji">🐋</span>
+        <div>
+          <strong>Data Whales</strong>
+          <small>Slow but massive — hard to dodge</small>
+        </div>
+        <span class="material-symbols-rounded threat-badge">data_usage</span>
+      </div>
+      <div class="threat chain">
+        <span class="threat-emoji">⛓️</span>
+        <div>
+          <strong>Chain Links</strong>
+          <small>Drifting on-chain debris (Hard+)</small>
+        </div>
+        <span class="material-symbols-rounded threat-badge">link</span>
+      </div>
+      <div class="threat jelly">
+        <span class="threat-emoji">🪼</span>
+        <div>
+          <strong>Mempool Stingers</strong>
+          <small>Pulsing hazards that block your path</small>
+        </div>
+        <span class="material-symbols-rounded threat-badge">bubble_chart</span>
+      </div>
+    </div>
+  </section>
+
+  @if (stats(); as s) {
+    <section class="stats-bar">
+      <div class="stat">
+        <span class="stat-value">{{ s.totalGames }}</span>
+        <span class="stat-label">Runs</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">{{ s.totalWins }}</span>
+        <span class="stat-label">Escapes</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">{{ s.topScore }}</span>
+        <span class="stat-label">Top Score</span>
+      </div>
+      @if (s.topPlayer) {
+        <div class="stat">
+          <span class="stat-value champ">
+            <span class="material-symbols-rounded">emoji_events</span>
+          </span>
+          <span class="stat-label">{{ s.topPlayer }}</span>
+        </div>
+      }
+    </section>
+  }
+
+  <footer class="controls-hint">
+    <span><span class="material-symbols-rounded sm">keyboard</span> Arrow keys / WASD</span>
+    <span><span class="material-symbols-rounded sm">swipe</span> Swipe to swim</span>
+    @if (!apiOnline()) {
+      <span class="offline">
+        <span class="material-symbols-rounded sm">cloud_off</span>
+        API offline — scores save when backend is connected
+      </span>
+    }
+  </footer>
+</div>

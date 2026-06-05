@@ -1,0 +1,60 @@
+<div class="leaderboard">
+  <header>
+    <a class="back" routerLink="/">← Home</a>
+    <h1><span>🏆</span> Leaderboard</h1>
+    <p>Top octopus escapists who reached — or nearly reached — the encrypted reef.</p>
+  </header>
+
+  @if (loading()) {
+    <div class="state">Loading scores...</div>
+  } @else if (error()) {
+    <div class="state error">{{ error() }}</div>
+  } @else if (scores().length === 0) {
+    <div class="state">No scores yet. Be the first to escape!</div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Diver</th>
+            <th>Score</th>
+            <th>Time</th>
+            <th>🔮</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (entry of scores(); track entry.id; let i = $index) {
+            <tr [class.winner]="entry.won">
+              <td class="rank">
+                @if (i === 0) {
+                  🥇
+                } @else if (i === 1) {
+                  🥈
+                } @else if (i === 2) {
+                  🥉
+                } @else {
+                  {{ i + 1 }}
+                }
+              </td>
+              <td class="name">{{ entry.playerName }}</td>
+              <td class="score">{{ entry.score }}</td>
+              <td>{{ entry.timeSeconds }}s</td>
+              <td>{{ entry.pearlsCollected }}</td>
+              <td>
+                @if (entry.won) {
+                  <span class="badge win">🪸 Escaped</span>
+                } @else {
+                  <span class="badge loss">🦈 Caught</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <a class="btn btn-primary" routerLink="/">🐙 Play Now</a>
+</div>
