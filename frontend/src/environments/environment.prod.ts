@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
   apiUrl: 'https://zama-reef-escape-api.onrender.com/api',
-  supabaseUrl: 'YOUR_SUPABASE_PROJECT_URL',
-  supabaseAnonKey: 'YOUR_SUPABASE_ANON_KEY',
+  supabaseUrl: 'https://yjrvihnjdtvvnbuglfiv.supabase.co',
+  supabaseAnonKey: 'sb_publishable_fBMh1Gglp0hUH93MQxHMMQ_n3HfwOFh',
 };
