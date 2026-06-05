@@ -60,6 +60,7 @@ export class GameEngine {
   private upwardStreak = 0;
   private movingUp = false;
   private screenShake = 0;
+  private shakeTimeLeft = 0;
   private flashAlpha = 0;
   private tutorialElapsed = 0;
   private checkpointsPassed = 0;
@@ -173,6 +174,7 @@ export class GameEngine {
     this.nearMissBonus = 0;
     this.upwardStreak = 0;
     this.screenShake = 0;
+    this.shakeTimeLeft = 0;
     this.flashAlpha = 0;
     this.tutorialElapsed = 0;
     this.checkpointsPassed = 0;
@@ -260,11 +262,16 @@ export class GameEngine {
   private loop(timestamp: number): void {
     const dt = Math.min((timestamp - this.lastTimestamp) / 1000, 0.05);
     this.lastTimestamp = timestamp;
+    if (this.status !== 'paused') {
+      this.updateShake(dt);
+    }
     if (this.status === 'countdown') {
       this.updateCountdown(dt);
       this.emitSnapshot();
     } else if (this.status === 'playing' || this.status === 'boss') {
       this.update(dt, timestamp);
+    } else if (this.status === 'lost' || this.status === 'won') {
+      this.emitSnapshot();
     }
     if (this.status !== 'paused') this.render(timestamp);
     this.rafId = requestAnimationFrame((t) => this.loop(t));
@@ -290,7 +297,6 @@ export class GameEngine {
     this.elapsedMs += dt * 1000;
     this.tentaclePhase += dt * 6;
     if (this.config.showTutorial) this.tutorialElapsed += dt;
-    this.screenShake = Math.max(0, this.screenShake - dt * 3);
     this.flashAlpha = Math.max(0, this.flashAlpha - dt * 2.5);
 
     this.applyPlayerBuffs(now);
@@ -364,6 +370,25 @@ export class GameEngine {
     }
     this.clampPlayer();
     this.updateCamera();
+  }
+
+  private triggerShake(intensity: number, duration = 3): void {
+    this.screenShake = intensity;
+    this.shakeTimeLeft = Math.min(3, Math.max(this.shakeTimeLeft, duration));
+  }
+
+  private updateShake(dt: number): void {
+    if (this.shakeTimeLeft <= 0) {
+      this.screenShake = 0;
+      return;
+    }
+    this.shakeTimeLeft -= dt;
+    if (this.shakeTimeLeft <= 0) {
+      this.screenShake = 0;
+      this.shakeTimeLeft = 0;
+    } else {
+      this.screenShake = this.shakeTimeLeft / 3;
+    }
   }
 
   private updateCombo(dt: number): void {
@@ -683,7 +708,7 @@ export class GameEngine {
       if (this.intersects(p.x, p.y, p.radius, enemy.x, enemy.y, enemy.radius)) {
         if (shielded) {
           enemy.active = false;
-          this.screenShake = 0.4;
+          this.triggerShake(0.5, 0.4);
           continue;
         }
         this.lose(enemy.kind as EnemyKind, '');
@@ -768,7 +793,7 @@ export class GameEngine {
   private lose(kind: EnemyKind, msg: string): void {
     this.status = 'lost';
     this.lastLoseIcon = LOSE_ICONS[kind];
-    this.screenShake = 1;
+    this.triggerShake(1, 3);
     this.sfx('hit');
     const defaults: Record<EnemyKind, string> = {
       shark: 'Public Shark caught you on-chain!',
