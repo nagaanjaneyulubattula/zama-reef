@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="40" fill="#041018"/>
+  <circle cx="96" cy="84" r="42" fill="#c026d3"/>
+  <circle cx="80" cy="78" r="7" fill="#fff"/>
+  <circle cx="112" cy="78" r="7" fill="#fff"/>
+  <circle cx="80" cy="78" r="3.5" fill="#1e1b4b"/>
+  <circle cx="112" cy="78" r="3.5" fill="#1e1b4b"/>
+  <path d="M54 102 Q96 126 138 102" stroke="#f0abfc" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M48 108 Q60 156 48 174" stroke="#a855f7" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M66 114 Q78 162 72 180" stroke="#c026d3" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M96 114 Q96 168 96 186" stroke="#c026d3" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M126 114 Q114 162 120 180" stroke="#c026d3" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M144 108 Q132 156 144 174" stroke="#a855f7" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <text x="96" y="36" text-anchor="middle" fill="#5ce1e6" font-family="system-ui,sans-serif" font-size="14" font-weight="700">ZAMA</text>
+</svg>

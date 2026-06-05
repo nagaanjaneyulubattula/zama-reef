@@ -1,0 +1,48 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  background: #041018;
+  color: #f8fafc;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(124, 58, 237, 0.12), transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(8, 145, 178, 0.1), transparent 50%),
+    #041018;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.25rem;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  vertical-align: middle;
+
+  &.sm {
+    font-size: 1rem;
+  }
+}
